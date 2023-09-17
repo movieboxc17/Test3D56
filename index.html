@@ -8,23 +8,27 @@
     <style>
         body {
             margin: 0;
+            overflow: hidden;
         }
-
         #container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            position: relative;
         }
-
-        input[type="file"] {
-            margin: 10px;
+        #loadButton {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <input type="file" id="fileInput" accept=".glb">
-    <div id="container"></div>
+    <div id="container">
+        <button id="loadButton">Load GLB</button>
+    </div>
     <script>
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -33,22 +37,21 @@
         document.getElementById('container').appendChild(renderer.domElement);
 
         const loader = new THREE.GLTFLoader();
-        const fileInput = document.getElementById('fileInput');
 
-        fileInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function () {
-                    const dataURL = reader.result;
-                    loader.parse(dataURL, '', (gltf) => {
-                        const model = gltf.scene;
-                        scene.add(model);
-                    });
-                };
-                reader.readAsArrayBuffer(file);
-            }
-        });
+        let modelLoaded = false;
+
+        // Function to load the GLB model
+        const loadModel = () => {
+            loader.load('model.glb', (gltf) => {
+                if (!modelLoaded) {
+                    const model = gltf.scene;
+                    scene.add(model);
+                    modelLoaded = true;
+                }
+            });
+        };
+
+        document.getElementById('loadButton').addEventListener('click', loadModel);
 
         camera.position.z = 5;
 
