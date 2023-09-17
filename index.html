@@ -23,11 +23,17 @@
             border: none;
             cursor: pointer;
         }
+        input[type="file"] {
+            position: absolute;
+            top: 10px;
+            left: 80px;
+        }
     </style>
 </head>
 <body>
     <div id="container">
-        <button id="loadButton">Load GLB</button>
+        <button id="loadButton" disabled>Load GLB</button>
+        <input type="file" id="fileInput" accept=".glb">
     </div>
     <script>
         const scene = new THREE.Scene();
@@ -37,7 +43,6 @@
         document.getElementById('container').appendChild(renderer.domElement);
 
         const loader = new THREE.GLTFLoader();
-
         let modelLoaded = false;
 
         // Function to load the GLB model
@@ -50,6 +55,11 @@
                 }
             });
         };
+
+        document.getElementById('fileInput').addEventListener('change', () => {
+            // Enable the Load GLB button when a file is selected
+            document.getElementById('loadButton').disabled = false;
+        });
 
         document.getElementById('loadButton').addEventListener('click', loadModel);
 
