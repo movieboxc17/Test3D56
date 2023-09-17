@@ -27,13 +27,25 @@
             position: absolute;
             top: 10px;
             left: 80px;
+            visibility: hidden;
+        }
+        #fileInputLabel {
+            position: absolute;
+            top: 10px;
+            left: 80px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <div id="container">
-        <button id="loadButton" disabled>Load GLB</button>
-        <input type="file" id="fileInput" accept=".glb">
+        <button id="loadButton" onclick="loadModel()" disabled>Load GLB</button>
+        <label for="fileInput" id="fileInputLabel">Select a GLB file</label>
+        <input type="file" id="fileInput" accept=".glb" style="display: none;">
     </div>
     <script>
         const scene = new THREE.Scene();
@@ -46,22 +58,29 @@
         let modelLoaded = false;
 
         // Function to load the GLB model
-        const loadModel = () => {
-            loader.load('model.glb', (gltf) => {
-                if (!modelLoaded) {
-                    const model = gltf.scene;
-                    scene.add(model);
-                    modelLoaded = true;
-                }
-            });
-        };
+        function loadModel() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    const dataURL = reader.result;
+                    loader.parse(dataURL, '', (gltf) => {
+                        if (!modelLoaded) {
+                            const model = gltf.scene;
+                            scene.add(model);
+                            modelLoaded = true;
+                        }
+                    });
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
 
         document.getElementById('fileInput').addEventListener('change', () => {
             // Enable the Load GLB button when a file is selected
             document.getElementById('loadButton').disabled = false;
         });
-
-        document.getElementById('loadButton').addEventListener('click', loadModel);
 
         camera.position.z = 5;
 
